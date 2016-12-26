@@ -22,10 +22,14 @@
 				$data = mysqli_query($dbc, $query);
 
 				if (mysqli_num_rows($data) == 1) {
-					// The log-in is OK so set the user ID and username variables
+					// The log-in is OK so set the user ID and username session variables (and cookies)
+					// and redirect to the home page
 					$row = mysqli_fetch_array($data);
 					$_SESSION['user_id'] = $row['user_id'];
 					$_SESSION['username'] = $row['username'];
+					// expires in 30 days
+					setcookie('user_id', $row['user_id'], time() + (60 * 60 * 24 * 30));
+					setcookie('username', $row['username'], time() + (60 * 60 * 24 * 30));
 					$home_url = 'http://' . $_SERVER['HTTP_HOST'] . dirname($_SERVER['PHP_SELF']) .
 						'/index.php';
 					header('Location: ' . $home_url);
@@ -52,7 +56,7 @@
 		<?php
 			// If the cookie is empty, show any error message and the log-in form,
 			// otherwise confirm the log-in
-			if (empty($_COOKIE['user_id'])) {
+			if (empty($_SESSION['user_id'])) {
 				echo '<p class="error">' . $error_msg . '</p>';
 		?>
 
