@@ -1,5 +1,5 @@
 <?php
-	require_once('login.php');
+	session_start();
 ?>
 
 <!DOCTYPE html>
@@ -18,6 +18,15 @@
 
   // Connect to the database
   $dbc = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+
+  // Make sure the user is logged in before going any further
+  if (!isset($_SESSION['user_id'])) {
+	echo '<p class="login">Please <a href="login.php">log in</a> to access this page.</p>';
+	exit();
+  } else {
+	echo('<p class="login">You are logged in as ' . $_SESSION['username'] .
+		'. <a href="logout.php">Log out</a>.</p>');
+  }
 
   if (isset($_POST['submit'])) {
     // Grab the profile data from the POST
@@ -73,11 +82,11 @@
         if (!empty($new_picture)) {
           $query = "UPDATE mismatch_user SET first_name = '$first_name', last_name = '$last_name'," .
 			"gender = '$gender', birthdate = '$birthdate', city = '$city', state = '$state'," .
-			"picture = '$new_picture' WHERE user_id = " . $_COOKIE['user_id'];
+			"picture = '$new_picture' WHERE user_id = " . $_SESSION['user_id'];
         } else {
           $query = "UPDATE mismatch_user SET first_name = '$first_name', last_name = '$last_name'," .
 			"gender = '$gender', birthdate = '$birthdate', city = '$city', state = '$state'" .
-			" WHERE user_id = '$user_id'";
+			" WHERE user_id = '". $_SESSION['user_id'] . "'";
         }
         mysqli_query($dbc, $query);
 
@@ -95,7 +104,7 @@
   else {
     // Grab the profile data from the database
     $query = "SELECT first_name, last_name, gender, birthdate, city, state, picture FROM mismatch_user " .
-		"WHERE user_id = " . $_COOKIE['user_id'];
+		"WHERE user_id = " . $_SESSION['user_id'];
     $data = mysqli_query($dbc, $query);
     $row = mysqli_fetch_array($data);
 

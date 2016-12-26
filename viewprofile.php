@@ -1,5 +1,5 @@
 <?php
-	require_once('login.php');
+	session_start();
 ?>
 
 <!DOCTYPE html>
@@ -20,7 +20,8 @@
   $dbc = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
   // Grab the profile data from the database
-  $query = "SELECT username, first_name, last_name, gender, birthdate, city, state, picture FROM mismatch_user WHERE user_id = '" . $_COOKIE['user_id'] . "'";
+  $query = "SELECT username, first_name, last_name, gender, birthdate, city, state, picture FROM " .
+		"mismatch_user WHERE user_id = '" . $_SESSION['user_id'] . "'";
   $data = mysqli_query($dbc, $query);
 
   if (mysqli_num_rows($data) == 1) {
@@ -50,7 +51,7 @@
       echo '</td></tr>';
     }
     if (!empty($row['birthdate'])) {
-      if (!isset($_COOKIE['user_id']) || ($user_id == $_COOKIE['user_id'])) {
+      if (!isset($_COOKIE['user_id'])) {
         // Show the user their own birthdate
         echo '<tr><td class="label">Birthdate:</td><td>' . $row['birthdate'] . '</td></tr>';
       }
